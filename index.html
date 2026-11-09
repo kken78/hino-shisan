@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1E4E9C">
+<title>固定資産台帳 町の資産｜日野町データポータル（非公式）</title>
+<meta name="description" content="滋賀県日野町が公開している固定資産台帳（令和6年度末時点）の資産の行9,896行を、種類・行政の目的・取得の時期ごとにまとめ、全行の一覧と財務書類の附属明細書との照合を示す（非公式）。">
+<link rel="canonical" href="https://kken78.github.io/hino-shisan/">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNiAyNiI+PHJlY3Qgd2lkdGg9IjI2IiBoZWlnaHQ9IjI2IiByeD0iNiIgZmlsbD0iI0VGRjNGOSIvPjxyZWN0IHg9IjMiIHk9IjE1IiB3aWR0aD0iMjAiIGhlaWdodD0iMy40IiByeD0iMS43IiBmaWxsPSIjMUU0RTlDIi8+PHJlY3QgeD0iNS41IiB5PSI5LjUiIHdpZHRoPSIxNSIgaGVpZ2h0PSIzLjQiIHJ4PSIxLjciIGZpbGw9IiMzQjZGQkYiLz48cmVjdCB4PSI5IiB5PSI0IiB3aWR0aD0iOCIgaGVpZ2h0PSIzLjQiIHJ4PSIxLjciIGZpbGw9IiNDMzNEMkUiLz48L3N2Zz4=">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="日野町データポータル（非公式）">
+<meta property="og:title" content="固定資産台帳 町の資産｜日野町データポータル">
+<meta property="og:description" content="日野町の固定資産台帳（令和6年度末時点）の資産の行を、種類・行政の目的・取得の時期ごとにまとめ、全行を一覧にする。公開資料から作成した個人の試作。">
+<meta property="og:url" content="https://kken78.github.io/hino-shisan/">
+<style>
+:root{
+  --ai:#1E4E9C; --ai-ink:#0C2547;
+  --bg:#EFF3F9; --card:#FFFFFF; --ink:#1A2333; --muted:#5B6B85; --line:#DCE4F0; --soft:#F7F9FC; --on:#F2F6FC;
+  --radius:12px;
+  /* 文字の大きさは共通の部品のトークン（14・16・18・20・24・32px）だけを使う（hino-portal DESIGN.md 5.2） */
+  --fs-sub:var(--portal-fs-sub); --fs:var(--portal-fs); --fs-h3:var(--portal-fs-h1); --fs-h2:var(--portal-fs-h3);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--portal-font);font-size:var(--fs);color:var(--ink);background:var(--bg);line-height:1.7;letter-spacing:.02em}
+a{color:var(--ai)}
+button,input,select{font-family:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid #000;box-shadow:0 0 0 4px #FFD43D;outline-offset:1px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.ext{display:inline-block;width:.9em;height:.9em;margin-left:3px;vertical-align:-1px}
+section{padding:32px 0 0}
+h2{font-size:var(--fs-h2);color:var(--ai-ink);line-height:1.4;margin-bottom:8px}
+h3{font-size:var(--fs-h3);color:var(--ai-ink);line-height:1.4;margin-bottom:8px}
+.lead{color:var(--ink);margin-bottom:16px;max-width:44em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-width:0}
+.card + .card{margin-top:16px}
+.note{font-size:var(--fs-sub);color:var(--muted);margin-top:8px;max-width:52em}
+.note + .note{margin-top:4px}
+ul.notes{font-size:var(--fs-sub);color:var(--muted);margin-top:8px;padding-left:1.2em;max-width:52em}
+ul.notes li{margin-bottom:4px}
+.nu{white-space:nowrap}
+/* 札 */
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;min-width:0}
+.kpi .k-label{font-weight:700;color:var(--ai-ink)}
+.kpi .k-num{font-size:var(--portal-fs-num);font-weight:800;line-height:1.3;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.kpi .k-num .u{font-size:var(--fs);font-weight:400;margin-left:4px}
+.kpi .k-sub{font-size:var(--fs-sub);color:var(--muted)}
+.kpi .k-sub + .k-sub{margin-top:2px}
+.kpi table{margin-top:8px;font-size:var(--fs-sub)}
+.kpi th,.kpi td{padding:4px 6px}
+.kpi tbody th{white-space:normal;min-width:8em;font-weight:400;color:var(--ink)}
+.pnav{margin-top:16px;font-size:var(--fs-sub);display:flex;flex-wrap:wrap;gap:4px 16px}
+.pnav .lbl{color:var(--muted)}
+/* 表 */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:top}
+thead th{font-size:var(--fs-sub);color:var(--muted);font-weight:700;background:var(--soft);vertical-align:bottom}
+thead th .sm{display:block;font-weight:400}
+th:first-child,td:first-child{text-align:left}
+tbody th{font-weight:700;color:var(--ai-ink)}
+td.txt,th.txt{text-align:left;white-space:normal;min-width:10em}
+td.txt.w{min-width:14em}
+tr.total th,tr.total td{border-top:2px solid var(--ai-ink);font-weight:700;background:var(--on)}
+tr.sub th{font-weight:400;padding-left:24px;color:var(--ink)}
+.t-sm{font-size:var(--fs-sub)}
+details.alt{margin-top:16px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card)}
+details.alt summary{cursor:pointer;font-size:var(--fs-sub);font-weight:700;color:var(--ai);padding:10px 0}
+details.alt .table-wrap{padding-bottom:12px}
+.formula{background:var(--soft);border-radius:8px;padding:8px 12px;margin:8px 0;font-size:var(--fs-sub)}
+blockquote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:8px 0;font-size:var(--fs-sub)}
+/* 取得の時期の棒 */
+.ages{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.age h3{font-size:var(--fs)}
+.bars{list-style:none}
+.bars li{display:grid;grid-template-columns:5.5em minmax(0,1fr) 6.5em;gap:8px;align-items:center;padding:2px 0;font-size:var(--fs-sub);font-variant-numeric:tabular-nums}
+.bars .yr{white-space:nowrap}
+.bars .bar{height:14px;background:var(--bg);border-radius:2px;overflow:hidden}
+.bars .bar i{display:block;height:100%;background:var(--portal-ai)}
+.bars .v{text-align:right;white-space:nowrap}
+/* 令和6年度の動き */
+.moves{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.mv .k-num{font-size:var(--fs-h2);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mv .k-sub{font-size:var(--fs-sub);color:var(--muted)}
+/* 一覧 */
+.filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.filters label{display:block;font-size:var(--fs-sub);color:var(--muted);font-weight:700}
+.filters .q{grid-column:1 / -1}
+.filters input,.filters select{display:block;width:100%;margin-top:4px;font-size:var(--fs);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+.list-top{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;margin:8px 0}
+.count b{color:var(--ai-ink)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:none;background:#fff;color:var(--ai);font-size:var(--fs-sub);font-weight:700;padding:8px 14px;min-height:44px}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ai-ink);color:#fff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font-size:var(--fs-sub);color:var(--ai);min-height:44px}
+.btn:disabled{color:var(--muted);cursor:default}
+.pager{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-top:12px;font-size:var(--fs-sub)}
+#tList td,#tList th{font-size:var(--fs-sub)}
+#tList td.name{min-width:16em}
+.empty{padding:16px 4px;color:var(--muted)}
+.issue{border-top:1px solid var(--line);padding:8px 0;font-size:var(--fs-sub)}
+.issue h4{font-size:var(--fs-sub);color:var(--ai-ink)}
+.learn{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.learn .card + .card{margin-top:0}
+.learn p,.learn li{font-size:var(--fs-sub);margin-bottom:8px}
+.learn ul{padding-left:1.2em}
+@media (max-width:767px){
+  .kpis,.ages,.moves,.learn{grid-template-columns:1fr}
+  .filters{grid-template-columns:1fr 1fr}
+  .card,.kpi{padding:12px}
+}
+</style>
+<!-- portal-shared:css start --><style>/* 日野町データポータル 共通の部品（見出し・ナビ・ページの見出し・フッター）。
+   正本は hino-portal/shared/shell.css。各ページはこれを <style> に写し、CI で同じであることを確かめる（DESIGN.md 9.1）。
+   文字の大きさは --portal-fs-sub 14px・--portal-fs 16px・--portal-fs-h1 18px・--portal-fs-h3 20px・--portal-fs-h2 24px の5段階だけ（DESIGN.md 5.2）。色は 3章の藍と朱。書体は端末のもの（5.1）。
+   --portal-cat1〜5 はグラフの区別の色（3.4）、--portal-pillar1〜5（面）と --portal-pillar1-ink〜5-ink（文字）は第6次総合計画の政策の柱の色（3.6）。 */
+:root{--portal-ai:#1E4E9C;--portal-ai-ink:#0C2547;--portal-shu:#C33D2E;--portal-bg:#EFF3F9;--portal-card:#FFFFFF;--portal-ink:#1A2333;--portal-muted:#5B6B85;--portal-line:#DCE4F0;--portal-foot-bg:#0C2547;--portal-foot-ink:#C9D6EA;--portal-cat1:#3460FB;--portal-cat2:#AC3E00;--portal-cat3:#197A4B;--portal-cat4:#008299;--portal-cat5:#767676;--portal-pillar1:#E72F5C;--portal-pillar2:#E36800;--portal-pillar3:#639B22;--portal-pillar4:#009AB4;--portal-pillar5:#3F51A2;--portal-pillar1-ink:#D91948;--portal-pillar2-ink:#B45300;--portal-pillar3-ink:#4F7B1B;--portal-pillar4-ink:#007A8F;--portal-pillar5-ink:#3F51A2;--portal-fs:16px;--portal-fs-sub:14px;--portal-fs-h1:18px;--portal-fs-h2:24px;--portal-fs-num:32px;--portal-fs-h3:20px;--portal-sp1:8px;--portal-sp2:16px;--portal-sp3:24px;--portal-sp4:40px;--portal-font:"Hiragino Sans","Hiragino Kaku Gothic ProN","BIZ UDPGothic","Yu Gothic Medium","Yu Gothic","Noto Sans CJK JP","Noto Sans JP",Meiryo,system-ui,sans-serif}
+.portal-wrap{max-width:1080px;margin:0 auto;padding:0 var(--portal-sp2);box-sizing:border-box}
+.portal-head,.portal-page,.portal-foot{font-family:var(--portal-font);font-size:var(--portal-fs);line-height:1.7;letter-spacing:.02em}
+.portal-head *,.portal-page *,.portal-foot *{box-sizing:border-box}
+.portal-head a:focus-visible,.portal-page a:focus-visible,.portal-foot a:focus-visible{outline:2px solid #000;box-shadow:0 0 0 4px #FFD43D;outline-offset:1px}
+/* 共通の見出し（2.2 の 1、2.3） */
+.portal-head{background:var(--portal-card);border-bottom:1px solid var(--portal-line);color:var(--portal-ink)}
+.portal-head .portal-wrap{display:flex;flex-wrap:wrap;align-items:center;gap:var(--portal-sp1) var(--portal-sp3);padding-top:var(--portal-sp1);padding-bottom:var(--portal-sp1)}
+.portal-brand{display:flex;align-items:center;gap:var(--portal-sp1);text-decoration:none;color:var(--portal-ink)}
+.portal-brand svg{width:26px;height:26px;flex:none}
+.portal-brand .portal-name{font-size:var(--portal-fs-h1);margin:0;font-weight:700;line-height:1.3}
+.portal-brand .portal-tag{font-size:var(--portal-fs-sub);color:var(--portal-muted);border:1px solid var(--portal-line);border-radius:3px;padding:0 6px;line-height:1.6}
+.portal-areas{display:flex;gap:var(--portal-sp2);margin-left:auto}
+.portal-areas a{font-size:var(--portal-fs-sub);text-decoration:none;color:var(--portal-ai);padding:4px 0;border-bottom:2px solid transparent;white-space:nowrap}
+.portal-areas a:hover{text-decoration:underline}
+.portal-areas a[aria-current]{color:var(--portal-ink);border-bottom-color:var(--portal-shu);font-weight:700}
+@media (max-width:767px){.portal-areas{margin-left:0;width:100%;overflow-x:auto}}
+/* ページの見出し（2.2 の 2・3） */
+.portal-page{padding:var(--portal-sp3) 0 var(--portal-sp2);color:var(--portal-ink)}
+.portal-page .portal-area{font-size:var(--portal-fs-sub);color:var(--portal-muted);margin:0 0 4px}
+.portal-page .portal-title{font-size:var(--portal-fs-h2);margin:0 0 4px;line-height:1.35;font-weight:700}
+.portal-page .portal-lead{margin:0 0 4px}
+.portal-page .portal-asof{font-size:var(--portal-fs-sub);color:var(--portal-muted);margin:0}
+.portal-siblings{font-size:var(--portal-fs-sub);margin:var(--portal-sp2) 0 0;display:flex;flex-wrap:wrap;gap:4px 0}
+.portal-siblings span,.portal-siblings a{padding-right:var(--portal-sp2)}
+.portal-siblings a{color:var(--portal-ai)}
+.portal-siblings span[aria-current]{font-weight:700;color:var(--portal-ink)}
+.portal-siblings .portal-lbl{color:var(--portal-muted)}
+/* フッター（2.5） */
+.portal-foot{margin-top:var(--portal-sp4);background:var(--portal-foot-bg);color:var(--portal-foot-ink);padding:var(--portal-sp3) 0 var(--portal-sp4);font-size:var(--portal-fs-sub)}
+.portal-foot a{color:#fff}
+.portal-foot dl{margin:0;display:grid;grid-template-columns:10em 1fr;gap:var(--portal-sp1) var(--portal-sp2)}
+.portal-foot dt{color:#fff;font-weight:700;margin:0}
+.portal-foot dd{margin:0}
+.portal-foot p{margin:0 0 4px}
+.portal-foot ul{margin:0;padding-left:1.2em}
+@media (max-width:767px){.portal-foot dl{grid-template-columns:1fr;gap:4px}.portal-foot dt{margin-top:var(--portal-sp1)}}
+</style><!-- portal-shared:css end -->
+</head>
+<body>
+<!-- portal-shared:header start -->
+<header class="portal-head"><div class="portal-wrap">
+<a class="portal-brand" href="https://kken78.github.io/hino-portal/"><svg viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="14" width="24" height="4" rx="2" fill="#1E4E9C"/><rect x="4" y="8" width="18" height="4" rx="2" fill="#3B6FBF"/><rect x="8" y="2" width="10" height="4" rx="2" fill="#C33D2E"/></svg><span class="portal-name">日野町データポータル</span><span class="portal-tag">非公式</span></a>
+<nav class="portal-areas" aria-label="分野"><a href="https://kken78.github.io/hino-portal/">トップ</a><a href="https://kken78.github.io/hino-portal/#g-plan" aria-current="page">計画と予算</a><a href="https://kken78.github.io/hino-portal/#g-stat">統計とくらし</a><a href="https://kken78.github.io/hino-portal/#g-council">議会</a></nav>
+</div></header>
+<!-- portal-shared:header end -->
+<div class="portal-page"><div class="portal-wrap">
+<p class="portal-area">計画と予算</p>
+<h1 class="portal-title">固定資産台帳 町の資産</h1>
+<p class="portal-lead">町が公開している固定資産台帳（令和6年度末時点）の資産の行を、種類・行政の目的・取得の時期ごとにまとめ、全行を一覧にしています。</p>
+<p class="portal-asof">資料の時点：令和6年度末（台帳の作成日 2026/03/10）。材料の版の固定日：2026年11月10日</p>
+<!-- portal-shared:siblings start -->
+<nav class="portal-siblings" aria-label="計画と予算のページ"><span class="portal-lbl">このほかのページ</span><a href="https://kken78.github.io/shiga-hino-plans/">計画ライブラリ</a><a href="https://kken78.github.io/hino-plan-dashboard/">総合計画 指標と事業費</a><a href="https://kken78.github.io/hino-budget/">当初予算 主な事業</a></nav>
+<!-- portal-shared:siblings end -->
+</div></div>
+
+<main>
+<section id="matome">
+<div class="wrap">
+<h2>台帳の全体</h2>
+<div class="kpis">
+<div class="kpi" id="kRows"></div>
+<div class="kpi" id="kRate"></div>
+<div class="kpi" id="kAcq"></div>
+<div class="kpi" id="kKimatsu"></div>
+</div>
+<p class="note">金額の計は、5つの区分（1円の行の区分）の計です。区分ごとの行の数と額を、それぞれの札に添えています。億円は表示のための換算（小数1桁に四捨五入）で、台帳の金額は円です。</p>
+<nav class="pnav" aria-label="このページの節"><span class="lbl">このページの節</span><a href="#shurui">資産の種類ごと</a><a href="#mokuteki">行政の目的ごと</a><a href="#jiki">取得の時期</a><a href="#ugoki">令和6年度の動き</a><a href="#ichiran">資産の一覧</a><a href="#shogo">財務書類との照合</a><a href="#data">データについて</a></nav>
+</div>
+</section>
+
+<section id="shurui">
+<div class="wrap">
+<h2>資産の種類ごと</h2>
+<p class="lead">財産番号の頭の字（土地・建物・工作物・物品・建設仮勘定・ソフトウェア）で分けた、行の数と金額です。全会計の行で、取得価額の多い順に並べています。</p>
+<div class="card">
+<div class="table-wrap"><table id="tKind"><thead></thead><tbody></tbody></table></div>
+<p class="note">億円は表示のための換算（小数1桁に四捨五入）。減価償却累計額は、土地と建設仮勘定の行では0です。</p>
+<p class="note" id="kindNote"></p>
+<details class="alt"><summary>種類と1円の行の区分ごとの表を開く（円）</summary><div class="table-wrap"><table id="tKindKubun" class="t-sm"><thead></thead><tbody></tbody></table></div></details>
+</div>
+</div>
+</section>
+
+<section id="mokuteki">
+<div class="wrap">
+<h2>行政の目的ごと</h2>
+<p class="lead">台帳の目的別資産区分ごとの行の数と金額、有形固定資産減価償却率です。財務書類と同じ範囲にするため、一般会計の有形固定資産の行（ソフトウェアと特別会計の行を除く）で数えています。</p>
+<div class="card">
+<p class="formula" id="rateFormula"></p>
+<div class="table-wrap"><table id="tPurpose"><thead></thead><tbody></tbody></table></div>
+<ul class="notes" id="purposeNotes"></ul>
+<details class="alt"><summary>目的と1円の行の区分ごとの表を開く（円）</summary><div class="table-wrap"><table id="tPurposeKubun" class="t-sm"><thead></thead><tbody></tbody></table></div></details>
+</div>
+<div class="card">
+<h3>有形固定資産減価償却率の見方</h3>
+<p class="t-sm">町の財務書類の概要は、この率を次のように説明しています（<span id="rateSrc"></span>）。</p>
+<blockquote><q>償却資産の取得価額等に対する減価償却累計額の割合を表します。</q><q>耐用年数に対して資産の取得からどの程度経過しているのかを全体として把握することが可能となります。</q></blockquote>
+<p class="t-sm">この率は、法定耐用年数による計算上の値で、建物の劣化の度合いや安全性そのものを示すものではありません。</p>
+</div>
+</div>
+</section>
+
+<section id="jiki">
+<div class="wrap">
+<h2>取得の時期</h2>
+<p class="lead">工作物と建物の取得価額を、取得年度の5年ごとに足したものです。2つのグラフは同じ目盛りです。年は西暦の年度で、和暦は下の数値の表にあります。全会計の行です。</p>
+<div class="card">
+<div class="ages" id="ages"></div>
+<ul class="notes" id="ageNotes"></ul>
+<details class="alt"><summary>数値の表を開く（取得年度の5年ごとの行の数と取得価額）</summary><div class="table-wrap"><table id="tAge" class="t-sm"><thead></thead><tbody></tbody></table></div></details>
+</div>
+</div>
+</section>
+
+<section id="ugoki">
+<div class="wrap">
+<h2>令和6年度の動き</h2>
+<p class="lead">台帳の当期取得額・当期除売却・当期評価増減等の列が0でない行です。全会計の行です。一覧は額の大きい順（当期評価増減等は額の絶対値の大きい順）に並べています。</p>
+<div class="moves" id="moves"></div>
+<ul class="notes" id="moveNotes"></ul>
+<div id="moveLists"></div>
+</div>
+</section>
+
+<section id="ichiran">
+<div class="wrap">
+<h2>資産の一覧</h2>
+<p class="lead">台帳の資産の行のすべてです。種類・目的・主管課・会計・1円の行の区分・取得年度と、資産名称・所在地の字で絞り込めます。資産名称と所在地は台帳の字のままです。金額は円です。</p>
+<div class="card">
+<div class="filters">
+<label class="q">資産名称・所在地の字<input type="search" id="fQ" placeholder="例：公民館"></label>
+<label>種類<select id="fKind"></select></label>
+<label>行政の目的<select id="fPur"></select></label>
+<label>主管課<select id="fDept"></select></label>
+<label>会計<select id="fAcc"></select></label>
+<label>1円の行の区分<select id="fKubun"></select></label>
+<label>取得年度（から）<select id="fFrom"></select></label>
+<label>取得年度（まで）<select id="fTo"></select></label>
+</div>
+<div class="list-top">
+<p class="count" id="count" aria-live="polite"></p>
+<div class="seg" role="group" aria-label="並べ方">
+<button type="button" data-sort="new" aria-pressed="true">取得日の新しい順</button><button type="button" data-sort="old" aria-pressed="false">取得日の古い順</button>
+</div>
+</div>
+<div class="table-wrap"><table id="tListKubun" class="t-sm"><thead></thead><tbody></tbody></table></div>
+<div class="table-wrap" style="margin-top:12px"><table id="tList"><thead></thead><tbody></tbody></table></div>
+<div class="pager"><button type="button" class="btn" id="prev">前の100行</button><span id="pageInfo"></span><button type="button" class="btn" id="next">次の100行</button></div>
+<p class="note">並べ方は画面の表示だけを変えます。取得日が同じ行は、財産番号と財産枝番の順です。</p>
+</div>
+</div>
+</section>
+
+<section id="shogo">
+<div class="wrap">
+<h2>財務書類との照合</h2>
+<p class="lead" id="shogoLead"></p>
+<div class="card">
+<h3>有形固定資産の明細</h3>
+<div class="table-wrap"><table id="tOne" class="t-sm"><thead></thead><tbody></tbody></table></div>
+<p class="note">差は「台帳の和 − 明細の額」。△ は負の値。単位は円。</p>
+</div>
+<div class="card">
+<h3>有形固定資産の行政目的別明細</h3>
+<div class="table-wrap"><table id="tTwo" class="t-sm"><thead></thead><tbody></tbody></table></div>
+<ul class="notes" id="twoNotes"></ul>
+</div>
+<div class="card">
+<h3>原典の誤りの記録</h3>
+<p class="t-sm">差のある箇所は、hino-town-docs の原典の誤りの記録に起票してあります。記録にある差だけを、照合で通しています。</p>
+<div id="tIssue"></div>
+<p class="note" id="issueLink"></p>
+</div>
+</div>
+</section>
+
+<section id="data">
+<div class="wrap">
+<h2>データについて</h2>
+<div class="learn">
+<div class="card"><h3>台帳と時点</h3>
+<p id="dSrc"></p>
+<p>台帳の時点は令和6年度末で、台帳の1行目の作成日は 2026/03/10 です。公表されている台帳はこの1時点だけで、年度をまたぐ比べ方はまだできません。</p>
+<p>台帳の会計名称には、一般会計と特別会計（農業集落排水事業・簡易水道・国民健康保険・介護保険）の行があり、水道事業会計・下水道事業会計の行はありません。</p>
+<p>台帳の「施設」「施設名称」の列は、9,896行すべてが空です。施設ごとの見方は、まだこのページにありません。</p>
+</div>
+<div class="card"><h3>金額の単位</h3>
+<p>台帳の金額の列の見出しと1行目には、単位の字がありません。財務書類の附属明細書（単位：円）の額と1円の単位まで合うことから、このページでは台帳の金額を円として扱っています。</p>
+<p>札と集計の表の億円は、表示のための換算（小数1桁に四捨五入）です。資産の一覧と財務書類との照合は円で示しています。</p>
+</div>
+<div class="card"><h3>1円の行の区分</h3>
+<p>台帳には、取得価額や期末簿価が1円の行が多くあります。1円で載せた行の金額をほかの行と区別せずに足すと、金額の大きさが読めないので、hino-town-docs で次の5つの区分を付けています。区分は、台帳の償却対象区分・備忘価額区分・取得価額・期末簿価の4つの列の値だけで決めています。</p>
+<ul>
+<li>価額のある資産：取得価額が1より大きく、期末簿価が1より大きい</li>
+<li>償却を終えて1円を残した資産：償却対象区分が「償却対象」、備忘価額区分が「1円残しする」、取得価額が1より大きく、期末簿価が1</li>
+<li>価額が0の資産：取得価額が0、または期末簿価が0（除却・売却した行や、期末簿価が0のソフトウェアの行など）</li>
+<li>1円で載せた土地：償却対象区分が「償却対象でない」で、取得価額が1</li>
+<li>1円で載せた償却資産：償却対象区分が「償却対象」で、取得価額が1</li>
+</ul>
+<p>区分の考え方は、総務省「資産評価及び固定資産台帳整備の手引き（案）」の段落によります。取得原価が不明な道路・河川・水路の敷地は備忘価額1円とする（Ⅶ-63）、昭和59年度以前の取得は原則として取得原価が不明なものとして扱う（Ⅶ-64）、耐用年数を過ぎた資産は備忘価額1円を残し、無形固定資産は残さない（Ⅵ-56）。段落の番号は手引き（案）で確かめたものです。</p>
+</div>
+<div class="card"><h3>計算した値と載せていないもの</h3>
+<p>有形固定資産減価償却率と、種類・目的・取得の時期ごとの和は、台帳の行の値から計算した値です。計算のしかたは、それぞれの節に書いています。原典の値は、財務書類の概要の率と附属明細書の額です。</p>
+<p>台帳の所有割合の列（100を超える行があります）、地区名称・地目名称の列は、このページに載せていません。地区での絞り込みは、所在地の字で代えています。</p>
+<p>資産名称は、台帳の字のまま全行を載せています（全角の空白や、書き込みのような「→」「？」の字も残しています）。資産名称を個人と結び付ける表示や並べ方はしていません。</p>
+<p>このページは、更新の費用の見込みや、施設の良し悪しを示すものではありません。</p>
+</div>
+<div class="card"><h3>検収と材料の版</h3>
+<p id="dAudit"></p>
+<p id="dInputs"></p>
+</div>
+</div>
+</div>
+</section>
+</main>
+
+<!-- portal-shared:footer start -->
+<footer class="portal-foot"><div class="portal-wrap">
+<dl>
+<dt>このページについて</dt><dd><p>このページは、滋賀県日野町 政策参与の東健二郎が、個人として作成した試作です。日野町の公式のサイトではなく、町の見解を示すものでもありません。</p><p>日野町が公開している固定資産台帳を、hino-town-docs で原典と照らして検収した資産の行の値から集計しています。合計は財務書類の附属明細書の額と照らしています。</p></dd>
+<dt>出典</dt><dd><p>日野町「固定資産台帳（令和6年度末時点）」（Excel：656KB）、「統一的な基準に基づく令和6年度財務書類4表（一般会計・全体・連結）」（PDF：940KB）、「統一的な基準に基づく令和6年度財務書類4表の概要」（PDF：1.4MB）。<a href="https://www.town.shiga-hino.lg.jp/0000002444.html" target="_blank" rel="noopener">日野町の掲載ページ<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a></p></dd>
+<dt>資料の時点</dt><dd>令和6年度末（台帳の作成日 2026/03/10）。原典の取得日は2026年11月7日、材料の版の固定日は2026年11月10日です。</dd>
+<dt>注意</dt><dd><p>内容の正確性を保証するものではありません。最新・正確な情報は日野町の公式ページでご確認ください。</p></dd>
+<dt>データ</dt><dd><a href="https://github.com/kken78/hino-shisan/blob/main/data.js" target="_blank" rel="noopener">data.js（画面用。材料から作ったもの）<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>、<a href="https://github.com/kken78/hino-shisan/blob/main/inputs.lock.json" target="_blank" rel="noopener">inputs.lock.json（材料の版）<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>。資産の行の値の TSV は <a href="https://github.com/kken78/hino-town-docs/blob/main/data/struct/kotei-shisan.tsv" target="_blank" rel="noopener">hino-town-docs の data/struct/kotei-shisan.tsv<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>。</dd>
+<dt>ソースコード</dt><dd><a href="https://github.com/kken78/hino-shisan" target="_blank" rel="noopener">kken78/hino-shisan<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></a>（GitHub）</dd>
+<dt>ライセンス</dt><dd>コードは MIT License。data.js の構造は CC BY 4.0。転記した文字と数字は日野町の公表資料によるもので、このリポジトリのライセンスの対象外です。</dd>
+</dl>
+</div></footer>
+<!-- portal-shared:footer end -->
+<script src="data.js"></script>
+<script>
+'use strict';
+const S = SHISAN;
+const F = {}; S.fields.forEach((f, i) => { F[f] = i; });
+const C = S.codes;
+const KUBUN = S.kubun;
+const TD_BLOB = 'https://github.com/kken78/hino-town-docs/blob/' + S.commit + '/';
+const EXT = '<svg class="ext" viewBox="0 0 16 16" role="img" aria-label="新しいタブで開きます"><path d="M6 3H3v10h10v-3M9 2h5v5M14 2 7 9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+const ext = (href, text) => '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + text + EXT + '</a>';
+const num = n => String(Math.abs(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+// 負の値は △ と絶対値（hino-portal DESIGN.md 3.3）
+const fmt = n => (n < 0 ? '△' : '') + num(n);
+const yen = n => '<span class="nu">' + fmt(n) + '円</span>';
+// 億円は表示のための換算。小数1桁に四捨五入（整数で計算する）
+function oku(v) {
+  if (v === 0) return '0';
+  const a = Math.abs(v), q = Math.floor((2 * a + 1e7) / 2e7);
+  return (v < 0 ? '△' : '') + num(Math.floor(q / 10)) + '.' + (q % 10);
+}
+// 率（%）。小数 d 桁に四捨五入
+function pct(a, b, d) {
+  if (!b) return '';
+  const m = Math.pow(10, d + 2), q = Math.floor((2 * a * m + b) / (2 * b));
+  const s = String(q), i = s.length > d ? s.slice(0, s.length - d) : '0', f = s.slice(-d).padStart(d, '0');
+  return (i || '0') + (d ? '.' + f : '');
+}
+const rateOf = (ru, ki) => pct(ru, ru + ki, 1);
+const docTitle = id => S.sources[id].title;
+function sizeOf(b) { return b >= 1048576 ? (Math.round(b / 104857.6) / 10) + 'MB' : Math.round(b / 1024) + 'KB'; }
+function srcLink(id, extra) {
+  const s = S.sources[id];
+  return ext(s.url, esc(s.title) + '（' + (s.format === 'pdf' ? 'PDF' : 'Excel') + '：' + sizeOf(s.bytes) + '）') + (extra || '');
+}
+const issueRef = nos => nos.map(n => ext(TD_BLOB + 'data/struct/issues/' + S.doc + '.tsv', '記録 no.' + esc(n))).join('、');
+const purName = n => n === '' ? '目的別資産区分が空' : n;
+
+// 節1 札 -----------------------------------------------------------------------
+(function () {
+  const T = S.total, R = S.rate;
+  const kb = (col, unit) => '<table><thead><tr><th>区分</th><th>行</th>' + (col === null ? '' : '<th>' + unit + '</th>') + '</tr></thead><tbody>' +
+    KUBUN.map((k, i) => '<tr><th>' + esc(k) + '</th><td>' + num(T.kubun[i][0]) + '</td>' + (col === null ? '' : '<td>' + fmt(T.kubun[i][col]) + '</td>') + '</tr>').join('') +
+    '</tbody></table>';
+  const acc = S.kaikei.map(x => esc(x[0]) + ' ' + num(x[1]) + '行').join('、');
+  $('kRows').innerHTML = '<p class="k-label">資産の行</p><p class="k-num">' + num(T.n) + '<span class="u">行</span></p>' +
+    '<p class="k-sub">財産番号と財産枝番の組の数。全会計（' + acc + '）</p>' + kb(null);
+  $('kAcq').innerHTML = '<p class="k-label">取得価額の計</p><p class="k-num">' + oku(T.acq) + '<span class="u">億円</span></p>' +
+    '<p class="k-sub">' + yen(T.acq) + '。全会計の5つの区分の計</p>' + kb(1, '取得価額（円）');
+  $('kKimatsu').innerHTML = '<p class="k-label">期末簿価の計</p><p class="k-num">' + oku(T.kimatsu) + '<span class="u">億円</span></p>' +
+    '<p class="k-sub">' + yen(T.kimatsu) + '。全会計の5つの区分の計</p>' + kb(3, '期末簿価（円）');
+  const g = R.gaiyou, ys = Object.keys(g);
+  $('kRate').innerHTML = '<p class="k-label">有形固定資産減価償却率</p><p class="k-num">' + rateOf(R.ruikei, R.kimatsu) + '<span class="u">%</span></p>' +
+    '<p class="k-sub">' + esc(S.fy_label) + '末。台帳の一般会計の償却する有形固定資産 ' + num(R.n) + '行から計算した値（計算の式は「行政の目的ごと」）</p>' +
+    '<p class="k-sub">町の財務書類の概要の値：' + ys.slice().reverse().slice(0, 2).map(y => esc(y) + ' <span class="nu">' + esc(g[y]) + '%</span>').join('、') +
+    '（' + srcLink('zaisei-r6-zaimu-gaiyou', ' ' + esc(R.gaiyou_page) + 'ページ') + '）</p>' +
+    '<p class="k-sub">償却を終えて1円を残した資産 <span class="nu">' + num(R.owari_n) + '行</span>（償却対象の <span class="nu">' + num(R.shokyaku_n) + '行</span>のうち。全会計）</p>';
+})();
+
+// 節2 種類ごと -------------------------------------------------------------------
+(function () {
+  const head = '<tr><th>種類</th><th>行</th><th>うち1円で載せた行</th><th>取得価額<span class="sm">億円</span></th><th>減価償却累計額<span class="sm">億円</span></th><th>期末簿価<span class="sm">億円</span></th></tr>';
+  $('tKind').querySelector('thead').innerHTML = head;
+  const T = S.total;
+  $('tKind').querySelector('tbody').innerHTML = S.kinds.map(k => '<tr><th>' + esc(k.name) + '</th><td>' + num(k.n) + '</td><td>' + num(k.n1en) + '</td><td>' + oku(k.acq) + '</td><td>' + oku(k.ruikei) + '</td><td>' + oku(k.kimatsu) + '</td></tr>').join('') +
+    '<tr class="total"><th>計</th><td>' + num(T.n) + '</td><td>' + num(S.kinds.reduce((a, k) => a + k.n1en, 0)) + '</td><td>' + oku(T.acq) + '</td><td>' + oku(T.ruikei) + '</td><td>' + oku(T.kimatsu) + '</td></tr>';
+  const kh = S.kind_hojo, n = kh.reduce((a, x) => a + x.n, 0);
+  $('kindNote').innerHTML = '財産番号の頭の字と、台帳の補助科目名称の分け方が違う行が ' + num(n) + ' あります（' +
+    kh.map(x => '頭の字が' + esc(x.kind) + 'で補助科目名称が「' + esc(x.hojo) + '」の行 ' + num(x.n)).join('、') +
+    '）。この表は頭の字で分け、財務書類との照合は補助科目名称で分けています。建設仮勘定は、頭の字が「建仮」と「建仮_工作物」の行です。';
+  $('tKindKubun').querySelector('thead').innerHTML = '<tr><th>種類</th><th class="txt">1円の行の区分</th><th>行</th><th>取得価額（円）</th><th>減価償却累計額（円）</th><th>期末簿価（円）</th></tr>';
+  $('tKindKubun').querySelector('tbody').innerHTML = S.kinds.map(k => k.kubun.map((x, i) => x[0] ? '<tr><th>' + esc(k.name) + '</th><td class="txt">' + esc(KUBUN[i]) + '</td><td>' + num(x[0]) + '</td><td>' + fmt(x[1]) + '</td><td>' + fmt(x[2]) + '</td><td>' + fmt(x[3]) + '</td></tr>' : '').join('') +
+    '<tr class="total"><th>' + esc(k.name) + '</th><td class="txt">計</td><td>' + num(k.n) + '</td><td>' + fmt(k.acq) + '</td><td>' + fmt(k.ruikei) + '</td><td>' + fmt(k.kimatsu) + '</td></tr>').join('') +
+    '<tr class="total"><th>全行</th><td class="txt">計</td><td>' + num(T.n) + '</td><td>' + fmt(T.acq) + '</td><td>' + fmt(T.ruikei) + '</td><td>' + fmt(T.kimatsu) + '</td></tr>';
+})();
+
+// 節3 目的ごと -------------------------------------------------------------------
+(function () {
+  const R = S.rate, M2 = S.meisai.two;
+  $('rateFormula').innerHTML = '有形固定資産減価償却率 ＝ 減価償却累計額 ÷（期末簿価 ＋ 減価償却累計額）。償却対象区分が「償却対象」の行だけで計算し、小数1桁に四捨五入しています。' +
+    '町の財務書類の概要の式（減価償却累計額 ÷（有形固定資産合計 − 非償却資産 ＋ 減価償却累計額）。非償却資産は土地・立木竹・建設仮勘定）を、台帳の行に当てたものです。' +
+    '全体は <span class="nu">' + rateOf(R.ruikei, R.kimatsu) + '%</span>（償却する行 ' + num(R.n) + '）で、概要の' + esc(S.fy_label) + 'の値 <span class="nu">' + esc(R.gaiyou[S.fy_label]) + '%</span> と同じです。';
+  $('tPurpose').querySelector('thead').innerHTML = '<tr><th>目的別資産区分</th><th>行</th><th>取得価額<span class="sm">億円</span></th><th>期末簿価<span class="sm">億円</span></th><th>償却する行</th><th>減価償却率<span class="sm">%</span></th></tr>';
+  const P = S.purposes;
+  const tot = P.reduce((a, p) => ({n: a.n + p.n, acq: a.acq + p.acq, kimatsu: a.kimatsu + p.kimatsu, dn: a.dn + p.dn, ru: a.ru + p.druikei, ki: a.ki + p.dkimatsu}), {n: 0, acq: 0, kimatsu: 0, dn: 0, ru: 0, ki: 0});
+  $('tPurpose').querySelector('tbody').innerHTML = P.map(p => '<tr><th class="txt">' + esc(purName(p.name)) + (p.issues.length && p.name ? '<br><span class="t-sm" style="font-weight:400">' + issueRef(p.issues) + '</span>' : '') + '</th><td>' + num(p.n) + '</td><td>' + oku(p.acq) + '</td><td>' + oku(p.kimatsu) + '</td><td>' + num(p.dn) + '</td><td>' + (p.dn ? rateOf(p.druikei, p.dkimatsu) : '') + '</td></tr>').join('') +
+    '<tr class="total"><th>計</th><td>' + num(tot.n) + '</td><td>' + oku(tot.acq) + '</td><td>' + oku(tot.kimatsu) + '</td><td>' + num(tot.dn) + '</td><td>' + rateOf(tot.ru, tot.ki) + '</td></tr>';
+  const keisatsu = P.filter(p => !p.in_meisai && p.name);
+  const somu = M2.find(x => x.name === '総務'), sonota = M2.find(x => x.name === 'その他'), gt = M2.find(x => x.name === '合計');
+  const notes = [
+    '並びは取得価額の多い順です。財務書類の附属明細書の行政目的別明細に列の無い区分（' + keisatsu.map(p => '「' + esc(p.name) + '」').join('') + 'と、目的別資産区分が空の行）は、最後に台帳の字のまま置いています。' +
+      keisatsu.map(p => '「' + esc(p.name) + '」の行は、原典の誤りの記録に起票しています（' + issueRef(p.issues) + '）。').join(''),
+    '財産枝番が1以上で目的別資産区分が空の行は、同じ財産番号の財産枝番0の行の区分で数えています（' + num(S.moved.length) + '行。' + S.moved.map(x => esc(x.split('/').slice(1).join(' 枝番 '))).join('、') + '）。hino-town-docs の財務書類との照合と同じ決まりです。',
+    '目的別資産区分が空の行は、財務書類との照合では、行政目的別明細の「その他」の列と比べています。',
+    '町の財務書類の概要（' + esc(R.gaiyou_wari_page) + 'ページ）の「有形固定資産の行政目的別割合」は、このページには載せていません。' + esc(S.fy_label) + 'の「総務」の値 ' + esc(R.gaiyou_somu) +
+      ' が、附属明細書の行政目的別明細の総務の列から計算した割合（' + pct(somu.meisai, gt.meisai, 2) + '%）と合わず、総務と「その他」の列の和から計算した割合（' + pct(somu.meisai + sonota.meisai, gt.meisai, 2) + '%）に当たるためです。',
+  ];
+  $('purposeNotes').innerHTML = notes.map(x => '<li>' + x + '</li>').join('');
+  $('rateSrc').innerHTML = srcLink('zaisei-r6-zaimu-gaiyou', ' ' + esc(R.gaiyou_page) + 'ページ');
+  $('tPurposeKubun').querySelector('thead').innerHTML = '<tr><th class="txt">目的別資産区分</th><th class="txt">1円の行の区分</th><th>行</th><th>取得価額（円）</th><th>減価償却累計額（円）</th><th>期末簿価（円）</th></tr>';
+  $('tPurposeKubun').querySelector('tbody').innerHTML = P.map(p => p.kubun.map((x, i) => x[0] ? '<tr><th class="txt">' + esc(purName(p.name)) + '</th><td class="txt">' + esc(KUBUN[i]) + '</td><td>' + num(x[0]) + '</td><td>' + fmt(x[1]) + '</td><td>' + fmt(x[2]) + '</td><td>' + fmt(x[3]) + '</td></tr>' : '').join('') +
+    '<tr class="total"><th class="txt">' + esc(purName(p.name)) + '</th><td class="txt">計</td><td>' + num(p.n) + '</td><td>' + fmt(p.acq) + '</td><td>' + fmt(p.ruikei) + '</td><td>' + fmt(p.kimatsu) + '</td></tr>').join('');
+})();
+
+// 節4 取得の時期 -----------------------------------------------------------------
+(function () {
+  const A = S.ages, B = A.bins;
+  const max = Math.max(...A.kinds.map(k => Math.max(...k.vals.map(v => v[1]))));
+  $('ages').innerHTML = A.kinds.map(k => {
+    const label = k.name + 'の取得価額（取得年度の5年ごと、' + B[0].label + 'から' + B[B.length - 1].label + '）。数値の表は下にあります';
+    return '<figure class="age" aria-label="' + esc(label) + '"><h3>' + esc(k.name) + 'の取得価額</h3><ol class="bars">' +
+      B.map((b, i) => '<li><span class="yr">' + esc(b.label) + '</span><span class="bar"><i style="width:' + (k.vals[i][1] / max * 100).toFixed(2) + '%"></i></span><span class="v">' + oku(k.vals[i][1]) + '億円</span></li>').join('') +
+      '</ol></figure>';
+  }).join('');
+  const notes = [];
+  A.kinds.forEach(k => {
+    if (k.exc_n) notes.push('1円で載せた償却資産（' + esc(k.name) + ' ' + num(k.exc_n) + '行）は、取得価額が1円で取得の大きさを表さないので、棒に入れていません。');
+  });
+  const ko = A.kinds.find(k => k.name === '工作物');
+  if (ko) {
+    const o = ko.oldest;
+    let t = '工作物の最も古い取得年度は' + esc(o.nendo.join('・')) + '（' + o.y + '年度）で、この年度の工作物は ' + num(o.n) + '行、取得価額の和は ' + yen(o.acq) + 'です' + (o.n1en ? '（うち1円で載せた償却資産 ' + num(o.n1en) + '行）' : '') + '。';
+    if (o.dates.length === 1 && o.toroku.length === 1 && o.hojo.length === 1)
+      t += num(o.n) + '行とも、取得日は ' + esc(o.dates[0]) + '、資産登録種別は「' + esc(o.toroku[0]) + '」、補助科目名称は「' + esc(o.hojo[0]) + '」です。';
+    notes.push(t);
+  }
+  const ta = A.kinds.find(k => k.name === '建物');
+  if (ta && ta.vals[0][0]) notes.push('建物には、' + esc(B[0].wareki) + '（' + esc(B[0].label) + '）の行が ' + num(ta.vals[0][0]) + '行あります（取得価額の和 ' + yen(ta.vals[0][1]) + '）。最も古いのは' + esc(ta.oldest.nendo.join('・')) + '（' + ta.oldest.y + '年度）の ' + num(ta.oldest.n) + '行です。');
+  notes.push('価額が0の資産（除却・売却した行など）も、台帳に載っている行として棒に入れています。');
+  $('ageNotes').innerHTML = notes.map(x => '<li>' + x + '</li>').join('');
+  $('tAge').querySelector('thead').innerHTML = '<tr><th>取得年度</th><th class="txt">和暦</th>' + A.kinds.map(k => '<th>' + esc(k.name) + '<span class="sm">行</span></th><th>' + esc(k.name) + '<span class="sm">億円</span></th><th>' + esc(k.name) + '<span class="sm">円</span></th>').join('') + '</tr>';
+  $('tAge').querySelector('tbody').innerHTML = B.map((b, i) => '<tr><th>' + esc(b.label) + '</th><td class="txt">' + esc(b.wareki) + '</td>' + A.kinds.map(k => '<td>' + num(k.vals[i][0]) + '</td><td>' + oku(k.vals[i][1]) + '</td><td>' + fmt(k.vals[i][1]) + '</td>').join('') + '</tr>').join('');
+})();
+
+// 節5 令和6年度の動き --------------------------------------------------------------
+(function () {
+  const MV = S.moves, rows = S.rows;
+  const defs = [['toki_shutoku', '当期取得額'], ['toki_jobaikyaku', '当期除売却'], ['toki_hyoka', '当期評価増減等']];
+  $('moves').innerHTML = defs.map(([c, l]) => '<div class="kpi mv"><p class="k-label">' + l + 'のある行</p><p class="k-num">' + num(MV[c].n) + '<span class="u">行</span></p><p class="k-sub">額の和 ' + yen(MV[c].sum) + '（' + oku(MV[c].sum) + '億円）</p><p class="k-sub">' + MV[c].kaikei.map(x => esc(x[0]) + ' ' + num(x[1])).join('、') + '</p></div>').join('');
+  const j = MV.toki_jobaikyaku, fy = MV.fy;
+  const jn = j.jobai_nendo.map(x => (x[0] ? '売却・除却年度が「' + esc(x[0]) + '」の行 ' : '売却・除却年度が空の行 ') + num(x[1])).join('、');
+  const notes = ['当期除売却のある ' + num(j.n) + '行のうち、' + jn + '。期末簿価が0の行は ' + num(j.kimatsu0) + 'です。'];
+  if (fy.no_shutoku.length) notes.push('取得年度が' + esc(S.fy_label) + 'の行は ' + num(fy.n) + 'で、当期取得額のある行（' + num(MV.toki_shutoku.n) + '）と ' + num(fy.n - MV.toki_shutoku.n) + '行違います。違う行は ' +
+    fy.no_shutoku.map(x => esc(x.zaisan_no) + ' の枝番' + esc(x.edaban) + '（' + esc(x.name) + '）で、当期取得額が0、当期評価増減等が ' + yen(x.toki_hyoka)).join('、') + 'です。');
+  notes.push('並びは額の大きい順です。売却・除却の日の無い行が多いため、日付の順にはしていません（hino-portal DESIGN.md 6.5 の「一覧は新しい順」の対象外としています）。');
+  $('moveNotes').innerHTML = notes.map(x => '<li>' + x + '</li>').join('');
+  $('moveLists').innerHTML = defs.map(([c, l]) => {
+    const jb = c === 'toki_jobaikyaku';
+    return '<details class="alt"><summary>' + l + 'のある行の一覧を開く（' + num(MV[c].n) + '行）</summary><div class="table-wrap"><table class="t-sm"><thead><tr><th>財産番号</th><th>枝番</th><th class="txt">資産名称</th><th class="txt">会計名称</th><th class="txt">主管課名称</th><th>種類</th><th>取得年度</th>' + (jb ? '<th>売却・除却年度</th>' : '') + '<th>' + l + '（円）</th></tr></thead><tbody>' +
+      MV[c].rows.map(i => { const r = rows[i]; return '<tr><td>' + esc(r[F.zaisan_no]) + '</td><td>' + esc(r[F.edaban]) + '</td><td class="txt w">' + esc(r[F.name]) + '</td><td class="txt">' + esc(C.kaikei_name[r[F.kaikei_name]]) + '</td><td class="txt">' + esc(C.shukan[r[F.shukan]]) + '</td><td>' + esc(C.kind[r[F.kind]]) + '</td><td>' + esc(r[F.shutoku_nendo]) + '</td>' + (jb ? '<td>' + esc(r[F.jobaikyaku_nendo]) + '</td>' : '') + '<td>' + fmt(r[F[c]]) + '</td></tr>'; }).join('') +
+      '</tbody></table></div></details>';
+  }).join('');
+})();
+
+// 節6 資産の一覧 ------------------------------------------------------------------
+(function () {
+  const rows = S.rows, PER = 100;
+  const opt = (v, t) => '<option value="' + esc(v) + '">' + esc(t) + '</option>';
+  const byCount = (col) => {
+    const cnt = new Map();
+    rows.forEach(r => cnt.set(r[F[col]], (cnt.get(r[F[col]]) || 0) + 1));
+    return [...cnt.entries()].sort((a, b) => b[1] - a[1]).map(([i, n]) => opt(i, (C[col][i] === '' ? '（空欄）' : C[col][i]) + '（' + num(n) + '行）')).join('');
+  };
+  $('fKind').innerHTML = opt('', 'すべて') + C.kind.map((k, i) => opt(i, k)).join('');
+  $('fPur').innerHTML = opt('', 'すべて') + byCount('mokuteki');
+  $('fDept').innerHTML = opt('', 'すべて') + byCount('shukan');
+  $('fAcc').innerHTML = opt('', 'すべて') + byCount('kaikei_name');
+  $('fKubun').innerHTML = opt('', 'すべて') + KUBUN.map((k, i) => opt(i, k)).join('');
+  const ys = [...new Set(rows.map(r => r[F.y]))].sort((a, b) => b - a);
+  const nendoOf = new Map(); rows.forEach(r => nendoOf.set(r[F.y], r[F.shutoku_nendo]));
+  const yopts = ys.map(y => opt(y, nendoOf.get(y) + '（' + y + '）')).join('');
+  $('fFrom').innerHTML = opt('', '指定なし') + yopts;
+  $('fTo').innerHTML = opt('', '指定なし') + yopts;
+  $('tListKubun').querySelector('thead').innerHTML = '<tr><th class="txt">1円の行の区分</th><th>行</th><th>取得価額（円）</th><th>期末簿価（円）</th></tr>';
+  $('tList').querySelector('thead').innerHTML = '<tr><th>財産番号</th><th>枝番</th><th class="txt">資産名称</th><th>種類</th><th class="txt">目的別資産区分</th><th class="txt">主管課名称</th><th class="txt">所在地</th><th>取得年度</th><th>取得日</th><th>耐用年数</th><th>数量</th><th>取得価額（円）</th><th>期末簿価（円）</th><th class="txt">1円の行の区分</th></tr>';
+  let sort = 'new', page = 0, cur = [];
+  const cmpKey = (a, b) => a[F.shutoku_date] < b[F.shutoku_date] ? -1 : a[F.shutoku_date] > b[F.shutoku_date] ? 1 :
+    a[F.zaisan_no] < b[F.zaisan_no] ? -1 : a[F.zaisan_no] > b[F.zaisan_no] ? 1 : (+a[F.edaban]) - (+b[F.edaban]);
+  function apply() {
+    const q = $('fQ').value.trim(), k = $('fKind').value, p = $('fPur').value, d = $('fDept').value, a = $('fAcc').value, kb = $('fKubun').value;
+    const from = $('fFrom').value, to = $('fTo').value;
+    cur = rows.filter(r => (k === '' || r[F.kind] === +k) && (p === '' || r[F.mokuteki] === +p) && (d === '' || r[F.shukan] === +d) &&
+      (a === '' || r[F.kaikei_name] === +a) && (kb === '' || r[F.kubun_1en] === +kb) && (from === '' || r[F.y] >= +from) && (to === '' || r[F.y] <= +to) &&
+      (q === '' || r[F.name].includes(q) || r[F.shozai].includes(q)));
+    cur.sort(cmpKey);
+    if (sort === 'new') { cur.reverse(); }
+    page = 0;
+    const s = KUBUN.map(() => [0, 0, 0]);
+    cur.forEach(r => { const x = s[r[F.kubun_1en]]; x[0]++; x[1] += r[F.shutoku_kagaku]; x[2] += r[F.kimatsu]; });
+    const t = s.reduce((a, x) => [a[0] + x[0], a[1] + x[1], a[2] + x[2]], [0, 0, 0]);
+    $('count').innerHTML = '絞り込んだ行 <b>' + num(cur.length) + '行</b>（全' + num(rows.length) + '行）';
+    $('tListKubun').querySelector('tbody').innerHTML = KUBUN.map((k, i) => '<tr><td class="txt">' + esc(k) + '</td><td>' + num(s[i][0]) + '</td><td>' + fmt(s[i][1]) + '</td><td>' + fmt(s[i][2]) + '</td></tr>').join('') +
+      '<tr class="total"><td class="txt">計</td><td>' + num(t[0]) + '</td><td>' + fmt(t[1]) + '</td><td>' + fmt(t[2]) + '</td></tr>';
+    draw();
+  }
+  function draw() {
+    const n = cur.length, pages = Math.max(1, Math.ceil(n / PER));
+    const part = cur.slice(page * PER, page * PER + PER);
+    $('tList').querySelector('tbody').innerHTML = part.length ? part.map(r => '<tr><td>' + esc(r[F.zaisan_no]) + '</td><td>' + esc(r[F.edaban]) + '</td><td class="txt name">' + esc(r[F.name]) + '</td><td>' + esc(C.kind[r[F.kind]]) +
+      '</td><td class="txt">' + esc(C.mokuteki[r[F.mokuteki]]) + '</td><td class="txt">' + esc(C.shukan[r[F.shukan]]) + '</td><td class="txt">' + esc(r[F.shozai]) + '</td><td>' + esc(r[F.shutoku_nendo]) + '</td><td>' + esc(r[F.shutoku_date]) +
+      '</td><td>' + esc(r[F.taiyo]) + '</td><td>' + esc(r[F.suryo]) + (r[F.suryo] !== '' ? ' ' + esc(C.tani[r[F.tani]]) : '') + '</td><td>' + fmt(r[F.shutoku_kagaku]) + '</td><td>' + fmt(r[F.kimatsu]) + '</td><td class="txt">' + esc(KUBUN[r[F.kubun_1en]]) + '</td></tr>').join('')
+      : '<tr><td colspan="14" class="empty">当たる行がありません。</td></tr>';
+    $('pageInfo').textContent = n ? (num(page * PER + 1) + '〜' + num(Math.min(n, page * PER + PER)) + '行目（' + num(page + 1) + '／' + num(pages) + 'ページ）') : '0行';
+    $('prev').disabled = page === 0;
+    $('next').disabled = page >= pages - 1;
+  }
+  let timer = null;
+  $('fQ').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(apply, 200); });
+  ['fKind', 'fPur', 'fDept', 'fAcc', 'fKubun', 'fFrom', 'fTo'].forEach(id => $(id).addEventListener('change', apply));
+  document.querySelectorAll('#ichiran .seg button').forEach(b => b.addEventListener('click', () => {
+    sort = b.dataset.sort;
+    document.querySelectorAll('#ichiran .seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    apply();
+  }));
+  $('prev').addEventListener('click', () => { if (page > 0) { page--; draw(); } });
+  $('next').addEventListener('click', () => { if ((page + 1) * PER < cur.length) { page++; draw(); } });
+  apply();
+})();
+
+// 節7 財務書類との照合 --------------------------------------------------------------
+(function () {
+  const M = S.meisai;
+  $('shogoLead').innerHTML = '台帳の一般会計の行（ソフトウェア ' + num(M.soft_n) + '行を除く ' + num(S.tang_n) + '行）を、補助科目名称と目的別資産区分でまとめ、財務書類4表の一般会計等の附属明細書（' +
+    srcLink('zaisei-r6-zaimu', ' PDF ' + M.pdf_page + 'ページ') + '）の額と比べた結果です。特別会計の ' + num(M.other_n) + '行は比べていません。金額は円です。';
+  const diff = (d, nos) => (d === 0 ? '0' : fmt(d)) + (nos.length ? '<br>' + issueRef(nos) : '');
+  $('tOne').querySelector('thead').innerHTML = '<tr><th rowspan="2">明細の区分</th><th rowspan="2">行</th><th colspan="3">取得価額（本年度末残高）</th><th colspan="3">減価償却累計額</th><th colspan="3">期末簿価（差引本年度末残高）</th></tr>' +
+    '<tr>' + [0, 1, 2].map(() => '<th>台帳の和</th><th>明細</th><th>差</th>').join('') + '</tr>';
+  $('tOne').querySelector('tbody').innerHTML = M.one.map(r => '<tr class="' + (r.name ? 'sub' : 'total') + '"><th>' + esc(r.name || r.group) + '</th><td>' + num(r.n) + '</td>' +
+    [0, 1, 2].map(i => '<td>' + fmt(r.daicho[i]) + '</td><td>' + fmt(r.meisai[i]) + '</td><td>' + diff(r.daicho[i] - r.meisai[i], r.daicho[i] - r.meisai[i] ? r.issues[i] : []) + '</td>').join('') + '</tr>').join('');
+  $('tTwo').querySelector('thead').innerHTML = '<tr><th class="txt">目的</th><th>行</th><th>台帳の期末簿価の和</th><th>明細の額（合計の行）</th><th>差</th></tr>';
+  $('tTwo').querySelector('tbody').innerHTML = M.two.map(r => '<tr' + (r.name === '合計' ? ' class="total"' : '') + '><th class="txt">' + esc(r.name) + '</th><td>' + num(r.n) + '</td><td>' + fmt(r.daicho) + '</td><td>' + (r.meisai === null ? '明細に列が無い' : fmt(r.meisai)) + '</td><td>' + diff(r.daicho - (r.meisai || 0), r.issues) + '</td></tr>').join('');
+  const nb = M.naibu.map(x => esc(x.name) + 'の行（目的の列の和 ' + yen(x.sum) + '、合計の列 ' + yen(x.total) + '）').join('、');
+  $('twoNotes').innerHTML = ['「その他」の列は、目的別資産区分が空の行と比べています。',
+    '明細の中で、目的の列の和が合計の列と合わない行があります。' + nb + '。',
+    '台帳の金額の列には単位の字がありません。明細の単位は「（単位：円）」で、台帳の和と明細の額が、記録にある差を除いて1円の単位まで合います。このページで台帳の金額を円として扱うのは、このためです。'].map(x => '<li>' + x + '</li>').join('');
+  $('tIssue').innerHTML = S.issues.map(x => '<div class="issue"><h4>no.' + esc(x.no) + ' ' + esc(x.kind) + '（状態 ' + esc(x.status) + '）</h4><p>' + esc(x.issue) + '</p></div>').join('');
+  $('issueLink').innerHTML = ext(TD_BLOB + 'data/struct/issues/' + S.doc + '.tsv', '原典の誤りの記録（hino-town-docs の data/struct/issues/' + esc(S.doc) + '.tsv）を GitHub で見る') + '。記録の状態が「未判断」の間は、原典の値のまま載せています。';
+})();
+
+// 節8 データについて ---------------------------------------------------------------
+(function () {
+  const s = S.sources[S.doc];
+  $('dSrc').innerHTML = '出典は、日野町が公開している ' + srcLink(S.doc) + ' の「固定資産一覧表」のシートです。財務書類との照合と減価償却率の比べる相手には、' + srcLink('zaisei-r6-zaimu') + ' と ' + srcLink('zaisei-r6-zaimu-gaiyou') + ' を使っています。原典の取得日は ' + esc(s.fetched) + ' です（' + ext(s.page_url, '日野町の掲載ページ') + '）。';
+  const A = S.audit;
+  $('dAudit').innerHTML = '資産の行の値は、hino-town-docs で原典（台帳の Excel から取り出した文字）と1行ずつ照らし、検算した行だけを使っています（' + num(A.n) + '行とも検収済み。' +
+    Object.entries(A.reviewers).map(([k, v]) => esc(k) + ' ' + num(v) + '行').join('、') + '）。' + ext(TD_BLOB + 'data/struct/audit/kotei.tsv', '検収の台帳（hino-town-docs の data/struct/audit/kotei.tsv）を GitHub で見る') + '。';
+  $('dInputs').innerHTML = '材料は ' + ext('https://github.com/kken78/hino-town-docs/tree/' + S.commit, 'hino-town-docs ' + esc(S.commit.slice(0, 7))) + ' の版です。tools/build_data.py が、種類・目的・区分ごとの和と全行の和、財務書類の附属明細書の額、概要の減価償却率を照らし、合わなければ data.js を書き出さない作りにしています。';
+})();
+</script>
+</body>
+</html>

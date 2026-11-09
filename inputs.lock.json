@@ -1,0 +1,47 @@
+{
+  "note": "tools/build_data.py が読む材料。hino-town-docs の origin/main（PR #32 のマージ）で固定した（2026-11-10）。材料は、このリポジトリと同じフォルダに置いた hino-town-docs から読む。固定資産台帳の資産の行の値と検収の台帳、原典の誤りの記録、財務書類4表とその概要の原典の文字（附属明細書との照合と、有形固定資産減価償却率の確かめに使う）、台帳の原典の文字（1行目の作成日だけを読む）、資料の台帳。",
+  "inputs": [
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/struct/kotei-shisan.tsv",
+      "sha256": "8d1edc2762c0e65f23ff2e1ecc2be9fbbb9ce8be369f68092306e5ab77210974"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/struct/audit/kotei.tsv",
+      "sha256": "119b7eb9bce3ad20ce26c7ed6ef743fd64280b3c34979f4b50711a397a167802"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/struct/issues/zaisei-r6-kotei.tsv",
+      "sha256": "50dba1182f3dfa8169c10294503f1fb6aa14fb785b364447c98baa5b96bd77da"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/text_raw/zaisei-r6-zaimu.txt",
+      "sha256": "e461050e0e24b27d7f4ef327e26b114121ae54551b32c32625c6c4b9cb57b70e"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/text_raw/zaisei-r6-zaimu-gaiyou.txt",
+      "sha256": "1a3d9e6e693f94a95c69c62a69512cf74d1fff5dc04aa8afab8e0b6efd15badb"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/text/zaisei-r6-kotei/01.tsv",
+      "sha256": "89fbd6d0778a041859e36aee4ef0e019cad6ab7eb4b709a2d5c06d9d1b758a5f"
+    },
+    {
+      "repo": "kken78/hino-town-docs",
+      "commit": "bde6f0c0a8e7f3fedb64b6e32306346975770f63",
+      "path": "data/sources.tsv",
+      "sha256": "f92f56792075d4ceb91a1dc6135a892ec6974e2d99dbc4867c1914b1252ef22b"
+    }
+  ]
+}

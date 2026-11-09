@@ -1,0 +1,82 @@
+# 材料の検算と data.js の再生成の確認。
+# プルリクエストと main への push のたびに、inputs.lock.json の commit の材料で
+# tools/build_data.py を実行し、作り直した data.js がコミットされたものと一致するかを確かめる。
+# 材料は hino-town-docs の1リポジトリ（固定資産台帳の資産の行の値・検収の台帳・原典の誤りの記録・財務書類の原典の文字・資料の台帳）。
+# あわせて、hino-portal の shared/ の検査（共通の部品、文字の大きさ、表記と太さ、幅 360px と 1024px での実寸）を走らせる。
+name: check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      # 材料のリポジトリを隣のフォルダに置くため、このリポジトリも1段下に置く
+      - uses: actions/checkout@v7
+        with:
+          path: hino-shisan
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: inputs.lock.json から材料の commit を読む
+        id: lock
+        working-directory: hino-shisan
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json, sys
+          lock = json.load(open('inputs.lock.json', encoding='utf-8'))
+          commits = {}
+          for i in lock['inputs']:
+              commits.setdefault(i['repo'], set()).add(i['commit'])
+          for repo, cs in commits.items():
+              if len(cs) != 1:
+                  sys.exit(f'{repo} の commit が1つに定まりません: {sorted(cs)}')
+          if set(commits) != {'kken78/hino-town-docs'}:
+              sys.exit(f'inputs.lock.json のリポジトリが hino-town-docs だけでない: {sorted(commits)}')
+          print('towndocs=' + commits['kken78/hino-town-docs'].pop())
+          PY
+
+      - uses: actions/checkout@v7
+        with:
+          repository: kken78/hino-town-docs
+          ref: ${{ steps.lock.outputs.towndocs }}
+          path: hino-town-docs
+
+      - name: 材料の検算と data.js の作り直し(build_data.py)
+        working-directory: hino-shisan
+        run: python3 tools/build_data.py --src "$GITHUB_WORKSPACE"
+
+      - name: data.js がコミットされたものと一致するか
+        working-directory: hino-shisan
+        run: |
+          if ! git diff --exit-code --stat -- data.js; then
+            echo "::error::data.js が材料から作り直した結果と一致しません。python3 tools/build_data.py を実行してコミットしてください。"
+            exit 1
+          fi
+
+      # 共通の部品（見出し・分野のナビ・ページの一覧・フッター）は hino-portal の shared/ の写し（DESIGN.md ADR-1）
+      - name: 共通の部品・文字の大きさ・表記と太さ（hino-portal の shared/check.py）
+        working-directory: hino-shisan
+        run: |
+          git clone --depth 1 https://github.com/kken78/hino-portal.git /tmp/hino-portal
+          python3 /tmp/hino-portal/shared/check.py --fonts --hyoki index.html
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: 実ブラウザでの文字の大きさと横のはみ出し（hino-portal の shared/check_mobile.mjs）
+        run: |
+          mkdir -p /tmp/pw && cd /tmp/pw
+          npm install --no-save --no-package-lock playwright@1.49.1
+          npx playwright install --with-deps chromium
+          cd "$GITHUB_WORKSPACE/hino-shisan"
+          PLAYWRIGHT_MODULE=/tmp/pw/node_modules/playwright/index.mjs node /tmp/hino-portal/shared/check_mobile.mjs index.html
