@@ -99,8 +99,23 @@ blockquote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:8px 0
 .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font-size:var(--fs-sub);color:var(--ai);min-height:44px}
 .btn:disabled{color:var(--muted);cursor:default}
 .pager{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;margin-top:12px;font-size:var(--fs-sub)}
+.pager .per{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted)}
+.pager .per select{font-size:var(--fs-sub);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:44px}
+#tList{width:100%}
 #tList td,#tList th{font-size:var(--fs-sub)}
-#tList td.name{min-width:16em}
+#tList td.name{min-width:10em;width:40%}
+#tList td.nw,#tList th.nw{white-space:nowrap}
+.rowbtn{display:block;width:100%;text-align:left;border:none;background:none;color:var(--ai);font-size:var(--fs-sub);font-family:inherit;line-height:1.6;padding:4px 0 4px 18px;position:relative;cursor:pointer}
+.rowbtn::before{content:"";position:absolute;left:2px;top:.75em;border:5px solid transparent;border-left-color:var(--ai);border-right-width:0}
+.rowbtn[aria-expanded="true"]::before{transform:rotate(90deg)}
+.rowbtn:hover{text-decoration:underline}
+#tList tr.more > td{background:var(--bg);padding:8px 12px 12px 30px}
+.kv{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 16px;margin:0}
+.kv div{min-width:0}
+.kv dt{font-size:var(--fs-sub);color:var(--muted);font-weight:400}
+.kv dd{font-size:var(--fs-sub);margin:0;text-align:left;overflow-wrap:anywhere}
+.kv .narrow{display:none}
+.rowsub{display:none;font-size:var(--fs-sub);color:var(--muted);padding-left:18px}
 .empty{padding:16px 4px;color:var(--muted)}
 .issue{border-top:1px solid var(--line);padding:8px 0;font-size:var(--fs-sub)}
 .issue h4{font-size:var(--fs-sub);color:var(--ai-ink)}
@@ -111,6 +126,13 @@ blockquote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:8px 0
 @media (max-width:767px){
   .kpis,.ages,.moves,.learn{grid-template-columns:1fr}
   .filters{grid-template-columns:1fr 1fr}
+  #tList .wide{display:none}
+  #tList td.name{min-width:7em;width:auto}
+  .rowsub{display:block}
+  #tList tr.more > td{padding-left:12px}
+  .kv{grid-template-columns:1fr 1fr}
+  .kv .narrow{display:block}
+  .pager .per{margin-left:0}
   .card,.kpi{padding:12px}
 }
 </style>
@@ -246,7 +268,7 @@ blockquote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:8px 0
 <section id="ichiran">
 <div class="wrap">
 <h2>資産の一覧</h2>
-<p class="lead">台帳の資産の行のすべてです。種類・目的・主管課・会計・1円の行の区分・取得年度と、資産名称・所在地の字で絞り込めます。資産名称と所在地は台帳の字のままです。金額は円です。</p>
+<p class="lead">台帳の資産の行のすべてです。種類・目的・主管課・会計・1円の行の区分・取得年度と、資産名称・所在地の字で絞り込めます。資産名称を押すと、その行の財産番号・主管課・取得日などが開きます。資産名称と所在地は台帳の字のままです。金額は円です。</p>
 <div class="card">
 <div class="filters">
 <label class="q">資産名称・所在地の字<input type="search" id="fQ" placeholder="例：公民館"></label>
@@ -264,9 +286,10 @@ blockquote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin:8px 0
 <button type="button" data-sort="new" aria-pressed="true">取得日の新しい順</button><button type="button" data-sort="old" aria-pressed="false">取得日の古い順</button>
 </div>
 </div>
-<div class="table-wrap"><table id="tListKubun" class="t-sm"><thead></thead><tbody></tbody></table></div>
+<details class="alt"><summary>絞り込んだ行の、1円の行の区分ごとの行の数と額を開く（円）</summary><div class="table-wrap"><table id="tListKubun" class="t-sm"><thead></thead><tbody></tbody></table></div></details>
+<div class="pager" id="pagerTop"><button type="button" class="btn" data-go="-1">前の行</button><span class="info"></span><button type="button" class="btn" data-go="1">次の行</button><label class="per">1ページの行<select id="fPer"><option value="20">20行</option><option value="50">50行</option><option value="100">100行</option></select></label></div>
 <div class="table-wrap" style="margin-top:12px"><table id="tList"><thead></thead><tbody></tbody></table></div>
-<div class="pager"><button type="button" class="btn" id="prev">前の100行</button><span id="pageInfo"></span><button type="button" class="btn" id="next">次の100行</button></div>
+<div class="pager" id="pagerBottom"><button type="button" class="btn" data-go="-1">前の行</button><span class="info"></span><button type="button" class="btn" data-go="1">次の行</button></div>
 <p class="note">並べ方は画面の表示だけを変えます。取得日が同じ行は、財産番号と財産枝番の順です。</p>
 </div>
 </div>
@@ -505,7 +528,7 @@ const purName = n => n === '' ? '目的別資産区分が空' : n;
 
 // 節6 資産の一覧 ------------------------------------------------------------------
 (function () {
-  const rows = S.rows, PER = 100;
+  const rows = S.rows; let PER = 20;
   const opt = (v, t) => '<option value="' + esc(v) + '">' + esc(t) + '</option>';
   const byCount = (col) => {
     const cnt = new Map();
@@ -523,7 +546,7 @@ const purName = n => n === '' ? '目的別資産区分が空' : n;
   $('fFrom').innerHTML = opt('', '指定なし') + yopts;
   $('fTo').innerHTML = opt('', '指定なし') + yopts;
   $('tListKubun').querySelector('thead').innerHTML = '<tr><th class="txt">1円の行の区分</th><th>行</th><th>取得価額（円）</th><th>期末簿価（円）</th></tr>';
-  $('tList').querySelector('thead').innerHTML = '<tr><th>財産番号</th><th>枝番</th><th class="txt">資産名称</th><th>種類</th><th class="txt">目的別資産区分</th><th class="txt">主管課名称</th><th class="txt">所在地</th><th>取得年度</th><th>取得日</th><th>耐用年数</th><th>数量</th><th>取得価額（円）</th><th>期末簿価（円）</th><th class="txt">1円の行の区分</th></tr>';
+  $('tList').querySelector('thead').innerHTML = '<tr><th class="txt">資産名称</th><th class="wide">種類</th><th class="txt wide">所在地</th><th class="nw wide">取得年度</th><th class="nw wide">取得価額（円）</th><th class="nw">期末簿価（円）</th></tr>';
   let sort = 'new', page = 0, cur = [];
   const cmpKey = (a, b) => a[F.shutoku_date] < b[F.shutoku_date] ? -1 : a[F.shutoku_date] > b[F.shutoku_date] ? 1 :
     a[F.zaisan_no] < b[F.zaisan_no] ? -1 : a[F.zaisan_no] > b[F.zaisan_no] ? 1 : (+a[F.edaban]) - (+b[F.edaban]);
@@ -544,17 +567,29 @@ const purName = n => n === '' ? '目的別資産区分が空' : n;
       '<tr class="total"><td class="txt">計</td><td>' + num(t[0]) + '</td><td>' + fmt(t[1]) + '</td><td>' + fmt(t[2]) + '</td></tr>';
     draw();
   }
+  const kv = (k, v, cls) => '<div' + (cls ? ' class="' + cls + '"' : '') + '><dt>' + k + '</dt><dd>' + (v === '' ? '（空欄）' : esc(v)) + '</dd></div>';
   function draw() {
     const n = cur.length, pages = Math.max(1, Math.ceil(n / PER));
     const part = cur.slice(page * PER, page * PER + PER);
-    $('tList').querySelector('tbody').innerHTML = part.length ? part.map(r => '<tr><td>' + esc(r[F.zaisan_no]) + '</td><td>' + esc(r[F.edaban]) + '</td><td class="txt name">' + esc(r[F.name]) + '</td><td>' + esc(C.kind[r[F.kind]]) +
-      '</td><td class="txt">' + esc(C.mokuteki[r[F.mokuteki]]) + '</td><td class="txt">' + esc(C.shukan[r[F.shukan]]) + '</td><td class="txt">' + esc(r[F.shozai]) + '</td><td>' + esc(r[F.shutoku_nendo]) + '</td><td>' + esc(r[F.shutoku_date]) +
-      '</td><td>' + esc(r[F.taiyo]) + '</td><td>' + esc(r[F.suryo]) + (r[F.suryo] !== '' ? ' ' + esc(C.tani[r[F.tani]]) : '') + '</td><td>' + fmt(r[F.shutoku_kagaku]) + '</td><td>' + fmt(r[F.kimatsu]) + '</td><td class="txt">' + esc(KUBUN[r[F.kubun_1en]]) + '</td></tr>').join('')
-      : '<tr><td colspan="14" class="empty">当たる行がありません。</td></tr>';
-    $('pageInfo').textContent = n ? (num(page * PER + 1) + '〜' + num(Math.min(n, page * PER + PER)) + '行目（' + num(page + 1) + '／' + num(pages) + 'ページ）') : '0行';
-    $('prev').disabled = page === 0;
-    $('next').disabled = page >= pages - 1;
+    $('tList').querySelector('tbody').innerHTML = part.length ? part.map((r, i) => '<tr><td class="txt name"><button type="button" class="rowbtn" aria-expanded="false" aria-controls="more' + i + '">' + esc(r[F.name]) + '</button><span class="rowsub">' + esc(C.kind[r[F.kind]]) + '・' + esc(r[F.shutoku_nendo]) + '</span></td><td class="wide nw">' + esc(C.kind[r[F.kind]]) +
+      '</td><td class="txt wide">' + esc(r[F.shozai]) + '</td><td class="nw wide">' + esc(r[F.shutoku_nendo]) + '</td><td class="nw wide">' + fmt(r[F.shutoku_kagaku]) + '</td><td class="nw">' + fmt(r[F.kimatsu]) + '</td></tr>' +
+      '<tr class="more" id="more' + i + '" hidden><td colspan="6"><dl class="kv">' + kv('財産番号', r[F.zaisan_no]) + kv('枝番', String(r[F.edaban])) + kv('種類', C.kind[r[F.kind]], 'narrow') + kv('所在地', r[F.shozai], 'narrow') +
+      kv('目的別資産区分', C.mokuteki[r[F.mokuteki]]) + kv('主管課名称', C.shukan[r[F.shukan]]) + kv('会計', C.kaikei_name[r[F.kaikei_name]]) + kv('取得年度', r[F.shutoku_nendo], 'narrow') + kv('取得日', r[F.shutoku_date]) + kv('耐用年数', String(r[F.taiyo])) +
+      kv('数量', r[F.suryo] !== '' ? r[F.suryo] + ' ' + C.tani[r[F.tani]] : '') + kv('取得価額（円）', fmt(r[F.shutoku_kagaku]), 'narrow') + kv('1円の行の区分', KUBUN[r[F.kubun_1en]]) + '</dl></td></tr>').join('')
+      : '<tr><td colspan="6" class="empty">当たる行がありません。</td></tr>';
+    const info = n ? (num(page * PER + 1) + '〜' + num(Math.min(n, page * PER + PER)) + '行目（' + num(page + 1) + '／' + num(pages) + 'ページ）') : '0行';
+    document.querySelectorAll('#ichiran .pager').forEach(pg => {
+      pg.querySelector('.info').textContent = info;
+      pg.querySelector('[data-go="-1"]').disabled = page === 0;
+      pg.querySelector('[data-go="1"]').disabled = page >= pages - 1;
+    });
   }
+  $('tList').addEventListener('click', e => {
+    const b = e.target.closest('.rowbtn'); if (!b) return;
+    const open = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', String(open));
+    $(b.getAttribute('aria-controls')).hidden = !open;
+  });
   let timer = null;
   $('fQ').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(apply, 200); });
   ['fKind', 'fPur', 'fDept', 'fAcc', 'fKubun', 'fFrom', 'fTo'].forEach(id => $(id).addEventListener('change', apply));
@@ -563,8 +598,13 @@ const purName = n => n === '' ? '目的別資産区分が空' : n;
     document.querySelectorAll('#ichiran .seg button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     apply();
   }));
-  $('prev').addEventListener('click', () => { if (page > 0) { page--; draw(); } });
-  $('next').addEventListener('click', () => { if ((page + 1) * PER < cur.length) { page++; draw(); } });
+  document.querySelectorAll('#ichiran .pager [data-go]').forEach(b => b.addEventListener('click', () => {
+    const to = page + (+b.dataset.go);
+    if (to < 0 || to * PER >= cur.length) return;
+    page = to; draw();
+    if (b.closest('#pagerBottom')) { $('pagerTop').scrollIntoView({ block: 'nearest' }); }
+  }));
+  $('fPer').addEventListener('change', () => { PER = +$('fPer').value; page = 0; draw(); });
   apply();
 })();
 
